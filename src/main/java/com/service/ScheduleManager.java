@@ -9,9 +9,6 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class ScheduleManager {
-  @Value("${scheduler.cron}")
-  private String cronExpression;
-
   private ContributeGenerator contributeGenerator;
 
   @Autowired
@@ -20,7 +17,7 @@ public class ScheduleManager {
   }
 
   // 使用 Spring 提供的 Cron 動態排程
-  @Scheduled(cron = "${scheduler.cron}")
+  @Scheduled(cron = "${contributor.scheduler.cron}")
   public void executeTask() {
     LoggerUtility.info(
         "Scheduled task executed at "

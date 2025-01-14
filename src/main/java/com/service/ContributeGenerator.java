@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.Base64;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -16,27 +17,38 @@ import org.springframework.stereotype.Service;
 @Service
 public class ContributeGenerator {
 
-  @Value("${file.path}")
+  @Value("${contributor.folder.path}")
+  private String folderPath;
+
+  @Value("${contributor.file.path}")
   private String filePath;
 
-  @Value("${git.username}")
+  @Value("${contributor.git.username}")
   private String gitUsername;
 
-  @Value("${git.password}")
+  @Value("${contributor.git.password}")
   private String gitPassword;
 
   // 總控制流程
   public void ContributeProcedure() {
     try {
       LoggerUtility.info("Start ContributeProcedure");
-      updateContent();
+
+      // 更新文檔內容
+      String resultUUID = updateContent();
+
+      // 更新GITHUB REPO
+      executeGitCommands(resultUUID);
+
+      LoggerUtility.info("ContributeProcedure finished");
     } catch (Exception e) {
       LoggerUtility.info("Error ContributeProcedure: " + e);
     }
   }
 
   // 更新檔案
-  private void updateContent() {
+  private String updateContent() {
+    String resultUUID = "";
     try {
       LoggerUtility.info("Start updateContent");
 
@@ -52,25 +64,34 @@ public class ContributeGenerator {
       LoggerUtility.info("Read first line: " + firstLine);
 
       // 3. 產生 UUID
-      String uuid = UUID.randomUUID().toString();
+      resultUUID = UUID.randomUUID().toString();
 
       // 4. 寫入檔案
       Files.write(
-          path, uuid.getBytes(), StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
+          path, resultUUID.getBytes(), StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
 
       // 5. log確認訊息
-      LoggerUtility.info("Generated UUID: " + uuid);
+      LoggerUtility.info("Generated UUID: " + resultUUID);
       LoggerUtility.info("UUID written to file: " + filePath);
 
     } catch (Exception e) {
       LoggerUtility.info("Error updateContent: " + e);
     }
+    return resultUUID;
   }
 
   // Git 更新指令
   private void executeGitCommands(String uuid) throws IOException, InterruptedException {
+    LoggerUtility.info("executeGitCommands:" + uuid);
+
+    // 檢查資料夾是否存在
+    File directory = new File(folderPath);
+    if (!directory.exists() || !directory.isDirectory()) {
+      throw new IllegalArgumentException("指定的資料夾不存在或無效: " + folderPath);
+    }
+
     ProcessBuilder builder = new ProcessBuilder();
-    builder.directory(new File("."));
+    builder.directory(directory); // 設定執行目錄為指定的資料夾
 
     // 執行 `git add .`
     runCommand(builder, "git add .");
@@ -88,7 +109,16 @@ public class ContributeGenerator {
 
   private void runCommand(ProcessBuilder builder, String command)
       throws IOException, InterruptedException {
-    builder.command("sh", "-c", command);
+
+    // 在 Windows 系統使用 cmd /c 執行命令
+    boolean isWindows = System.getProperty("os.name").toLowerCase().contains("win");
+    if (isWindows) {
+      builder.command("cmd", "/c", command);
+    } else {
+      // 非 Windows 系統使用 sh -c
+      builder.command("sh", "-c", command);
+    }
+
     Process process = builder.start();
     try (BufferedReader reader =
         new BufferedReader(new InputStreamReader(process.getInputStream()))) {
@@ -105,6 +135,6 @@ public class ContributeGenerator {
 
   private String encodeCredentials(String username, String password) {
     String credentials = username + ":" + password;
-    return java.util.Base64.getEncoder().encodeToString(credentials.getBytes());
+    return Base64.getEncoder().encodeToString(credentials.getBytes());
   }
 }
