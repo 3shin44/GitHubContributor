@@ -23,11 +23,11 @@ public class ContributeGenerator {
   @Value("${contributor.file.path}")
   private String filePath;
 
-  @Value("${contributor.git.username}")
-  private String gitUsername;
+  @Value("${contributor.git.repo}")
+  private String gitRepo;
 
-  @Value("${contributor.git.password}")
-  private String gitPassword;
+  @Value("${contributor.git.pat}")
+  private String gitPAT;
 
   // 總控制流程
   public void ContributeProcedure() {
@@ -99,11 +99,13 @@ public class ContributeGenerator {
     // 執行 `git commit`
     runCommand(builder, "git commit -m \"" + uuid + "\"");
 
-    // 執行 `git push`
-    String gitPushCommand =
-        String.format(
-            "git -c http.extraHeader=\"Authorization: Basic %s\" push",
-            encodeCredentials(gitUsername, gitPassword));
+    // 執行 `git push`  (組合成完整的 push 指令)
+    String repoBaseUrl = gitRepo.replace("https://", "");
+    String gitPushCommand = String.format(
+            "git push https://%s@%s",
+            gitPAT,
+            repoBaseUrl
+    );
     runCommand(builder, gitPushCommand);
   }
 
@@ -131,10 +133,5 @@ public class ContributeGenerator {
     if (exitCode != 0) {
       throw new RuntimeException("Command failed with exit code: " + exitCode);
     }
-  }
-
-  private String encodeCredentials(String username, String password) {
-    String credentials = username + ":" + password;
-    return Base64.getEncoder().encodeToString(credentials.getBytes());
   }
 }
