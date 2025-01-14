@@ -18,7 +18,8 @@ public class Application {
 
     try {
       if (externalConfigFile.exists() && externalConfigFile.isFile()) {
-        System.setProperty("spring.config.additional-location", "file:" + externalConfigFile.getAbsolutePath());
+        System.setProperty(
+            "spring.config.additional-location", "file:" + externalConfigFile.getAbsolutePath());
         System.out.println("外部配置文件已加載: " + externalConfigFile.getAbsolutePath());
       } else {
         System.out.println("外部配置文件不存在或無效，使用內部配置。");
@@ -29,6 +30,5 @@ public class Application {
     }
 
     application.run(args);
-
   }
 }

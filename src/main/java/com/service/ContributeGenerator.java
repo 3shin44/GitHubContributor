@@ -9,7 +9,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.Base64;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -68,7 +67,10 @@ public class ContributeGenerator {
 
       // 4. 寫入檔案
       Files.write(
-          path, resultUUID.getBytes(), StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
+          path,
+          resultUUID.getBytes(),
+          StandardOpenOption.WRITE,
+          StandardOpenOption.TRUNCATE_EXISTING);
 
       // 5. log確認訊息
       LoggerUtility.info("Generated UUID: " + resultUUID);
@@ -101,11 +103,7 @@ public class ContributeGenerator {
 
     // 執行 `git push`  (組合成完整的 push 指令)
     String repoBaseUrl = gitRepo.replace("https://", "");
-    String gitPushCommand = String.format(
-            "git push https://%s@%s",
-            gitPAT,
-            repoBaseUrl
-    );
+    String gitPushCommand = String.format("git push https://%s@%s", gitPAT, repoBaseUrl);
     runCommand(builder, gitPushCommand);
   }
 
