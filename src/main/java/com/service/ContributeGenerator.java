@@ -29,19 +29,19 @@ public class ContributeGenerator {
   private String gitPAT;
 
   // 總控制流程
-  public void ContributeProcedure() {
+  public void contributeProcedure() {
     try {
-      LoggerUtility.info("Start ContributeProcedure");
+      LoggerUtility.info("Start contributeProcedure");
 
-      // 更新文檔內容
+      // 產生GIT差異 (更新文檔內容)
       String resultUUID = updateContent();
 
       // 更新GITHUB REPO
       executeGitCommands(resultUUID);
 
-      LoggerUtility.info("ContributeProcedure finished");
+      LoggerUtility.info("End contributeProcedure");
     } catch (Exception e) {
-      LoggerUtility.info("Error ContributeProcedure: " + e);
+      LoggerUtility.info("Error contributeProcedure: " + e);
     }
   }
 
@@ -55,12 +55,12 @@ public class ContributeGenerator {
       Path path = Paths.get(filePath);
       if (!Files.exists(path)) {
         Files.createFile(path);
-        LoggerUtility.info("File created at path: " + filePath);
+        LoggerUtility.info("Create file at: " + filePath);
       }
 
       // 2. 讀取檔案的第一行
       String firstLine = Files.lines(path).findFirst().orElse("No content in file");
-      LoggerUtility.info("Read first line: " + firstLine);
+      LoggerUtility.info("Current content: " + firstLine);
 
       // 3. 產生 UUID
       resultUUID = UUID.randomUUID().toString();
@@ -73,8 +73,7 @@ public class ContributeGenerator {
           StandardOpenOption.TRUNCATE_EXISTING);
 
       // 5. log確認訊息
-      LoggerUtility.info("Generated UUID: " + resultUUID);
-      LoggerUtility.info("UUID written to file: " + filePath);
+      LoggerUtility.info("Replace with new UUID: " + resultUUID);
 
     } catch (Exception e) {
       LoggerUtility.info("Error updateContent: " + e);
@@ -84,7 +83,7 @@ public class ContributeGenerator {
 
   // Git 更新指令
   private void executeGitCommands(String uuid) throws IOException, InterruptedException {
-    LoggerUtility.info("executeGitCommands:" + uuid);
+    LoggerUtility.info("Start executeGitCommands: " + uuid);
 
     // 檢查資料夾是否存在
     File directory = new File(folderPath);
@@ -93,7 +92,8 @@ public class ContributeGenerator {
     }
 
     ProcessBuilder builder = new ProcessBuilder();
-    builder.directory(directory); // 設定執行目錄為指定的資料夾
+    // 設定執行目錄為指定的資料夾
+    builder.directory(directory);
 
     // 執行 `git add .`
     runCommand(builder, "git add .");
@@ -105,6 +105,8 @@ public class ContributeGenerator {
     String repoBaseUrl = gitRepo.replace("https://", "");
     String gitPushCommand = String.format("git push https://%s@%s", gitPAT, repoBaseUrl);
     runCommand(builder, gitPushCommand);
+
+    LoggerUtility.info("End executeGitCommands");
   }
 
   private void runCommand(ProcessBuilder builder, String command)
@@ -124,7 +126,7 @@ public class ContributeGenerator {
         new BufferedReader(new InputStreamReader(process.getInputStream()))) {
       String line;
       while ((line = reader.readLine()) != null) {
-        System.out.println(line);
+        LoggerUtility.info("runCommand: " + line);
       }
     }
     int exitCode = process.waitFor();

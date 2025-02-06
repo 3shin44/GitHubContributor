@@ -1,5 +1,7 @@
-package com.service;
+package com.schedule;
 
+import com.service.ContributeGenerator;
+import com.service.RandomHandler;
 import com.util.LoggerUtility;
 import java.time.format.DateTimeFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,11 +10,19 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class ScheduleManager {
+
   private ContributeGenerator contributeGenerator;
 
   @Autowired
   public void ContributeGenerator(ContributeGenerator contributeGenerator) {
     this.contributeGenerator = contributeGenerator;
+  }
+
+  private RandomHandler randomHandler;
+
+  @Autowired
+  public void RandomHandler(RandomHandler randomHandler) {
+    this.randomHandler = randomHandler;
   }
 
   // 使用 Spring 提供的 Cron 動態排程
@@ -22,6 +32,9 @@ public class ScheduleManager {
         "Scheduled task executed at "
             + java.time.LocalDateTime.now()
                 .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-    contributeGenerator.ContributeProcedure();
+    boolean needRunFlag = randomHandler.percentLottery();
+    if (needRunFlag) {
+      contributeGenerator.contributeProcedure();
+    }
   }
 }
