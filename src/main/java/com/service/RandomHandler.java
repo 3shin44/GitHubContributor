@@ -25,6 +25,8 @@ public class RandomHandler {
       result = true;
     }
 
+    LoggerUtility.info("End percentLottery: skip flag: " + result);
+
     return result;
   }
 }

@@ -23,16 +23,18 @@
 1. 替換使用者名稱與EMAIL，容器名稱預設: "ubuntu-java17-git"
 `docker build --build-arg GIT_USER="GitUserName" --build-arg GIT_EMAIL="GitEmail@example.com" -t ubuntu-java17-git .`
 備註: 此處須與GitHub Repository Email相同或相關才會納入計算
-2. 匯出
+2. (optional) 匯出
 `docker save -o ubuntu-java17-git ubuntu-java17-git`
-3. 佈署環境匯入
+3. (optional) 佈署環境匯入
 `docker load -i ubuntu-java17-git`
+
+建議於原生環境build IMAGE，避免底層架構問題
 
 ### JAR & Clone Git Repository
 1. 將JAR & external.properties 放置相同目錄下 (例: D:/Folder or /home/user/Folder)
 2. 啟動IMAGE並掛載至CONTAINER內
-` docker run -it --rm -v D:/Folder:/app ubuntu-java17-git`
-` docker run -it --rm -v /home/user/Folder:/app ubuntu-java17-git`
+`docker run -it --rm -v D:/Folder:/app ubuntu-java17-git`
+`docker run -it --rm -v /home/user/Folder:/app ubuntu-java17-git`
 3. 進入容器後執行GIT CLONE
 `git clone {GitHub Repo}`
 4. 開啟external.properties設定以下參數
