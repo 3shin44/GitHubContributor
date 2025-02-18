@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  github-contributor:
+    container_name: deployGitHubContributor
+    image: ubuntu-java17-git
+    # 容器異常時自動重啟
+    restart: always
+    volumes:
+    # 掛載主機的目錄到容器內部 /app 目錄
+    # 替換APP_PATH為主機路徑或由外部.env檔案寫入
+      - ${APP_PATH}:/app
+    environment:
+      - TZ=Asia/Taipei
+    command: >
+      bash -c "
+      cd /app &&
+      git config --global --add safe.directory '*' &&
+      nohup java -jar github-contributor.jar > /app/nohup.out 2>&1 &
+      tail -f /app/nohup.out"

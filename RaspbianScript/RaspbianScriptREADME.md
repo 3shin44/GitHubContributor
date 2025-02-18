@@ -15,3 +15,11 @@ CONTAINER_NAME: 容器名稱，兩者設定相同，便於script辨識
 PROJECT_DIR: 專案資料夾目錄位置
 
 ### stop_container.sh
+
+## docker-compose版本
+
+改由docker compose管理容器，容器異常時管理較方便
+
+### start_compose.sh, stop_compose.sh
+
+${APP_PATH}: 設定主機掛載路徑 (ex: /home/pi/) 或改由.env檔案設定
