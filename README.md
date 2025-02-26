@@ -8,6 +8,16 @@
 
 寫入檔案後推送至GitHub產生活躍紀錄
 
+### 隨機模式
+
+- 排程執行次數
+
+依照排程次數執行，可設定機率，例如：每次排程執行時，有50%機率執行
+
+- 隨機數
+
+每次排程啟動後，隨機產生活躍次數，例如：每次排程執行時，隨機執行N次
+
 ## 安裝啟動
 
 ### 環境
@@ -39,7 +49,10 @@
 `git clone {GitHub Repo}`
 4. 開啟external.properties設定以下參數
 ```
-# 排程啟動 (範例: 每天AM0900, 1000執行)
+# 隨機模式: 排程執行次數
+# 排程開關 (預設關閉)
+contributor.scheduler.enabled=false
+# 排程執行時間 (範例: 每天AM0900, 1000執行)
 contributor.scheduler.cron=0 0 9,10 * * ?
 # GitHub Repo本地端路徑 (指向容器內路徑, 例: /app/GitHubContributor)
 contributor.folder.path=path_to_folder
@@ -51,6 +64,25 @@ contributor.git.repo=your_git_repo
 contributor.git.pat=your_git_personal_access_token
 # 不執行機率 (0-100, 未設置時預設為0)
 contributor.skip.percentage=30
+
+
+# 隨機模式: 隨機數
+# 排程開關 (預設關閉)
+contributor.random-count.scheduler.enabled=false
+# 排程執行時間 (範例: 每天AM0900, 1000執行)
+contributor.random-count.scheduler.cron=0 0 9,10 * * ?
+# GitHub Repo本地端路徑
+contributor.random-count.folder.path=${contributor.folder.path}
+# 產生異動用的檔案
+contributor.random-count.file.path=${contributor.file.path}
+# GitHub Repo
+contributor.random-count.git.repo=${contributor.git.repo}
+# GitHub PAT (Personal Access Token)
+contributor.random-count.git.pat=${contributor.git.pat}
+# 隨機執行次數上限 (預設: 0)
+contributor.random-count.max-count=5
+# 每次Push間隔時間(秒) (預設: 15)
+contributor.random-count.delay=15
 ```
 5. 執行JAR
 `java -jar github-contributor.jar`
