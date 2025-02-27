@@ -25,6 +25,11 @@ public class ScheduleRandomHandler {
 
   private RandomHandler randomHandler;
 
+  @Autowired
+  public void RandomHandler(RandomHandler randomHandler) {
+    this.randomHandler = randomHandler;
+  }
+
   // 使用 Spring 提供的 Cron 動態排程
   @Scheduled(cron = "${contributor.scheduler.cron}")
   public void executeTask() {
@@ -32,6 +37,7 @@ public class ScheduleRandomHandler {
         "ScheduleRandomHandler executed at "
             + java.time.LocalDateTime.now()
                 .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+
     boolean needRunFlag = randomHandler.percentLottery();
     if (needRunFlag) {
       contributeGenerator.contributeProcedure();
